@@ -1,0 +1,107 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<canvas height='320' width='480' id='example'>Обновите браузер</canvas><br>
+		<script>
+			function vector(x,y){
+				this.x=x;
+				this.y=y;
+				this.sum = function(v){
+					return new vector(this.x+v.x,this.y+v.y);
+				}
+				this.len = function(v){
+					return Math.sqrt((this.x-v.x)*(this.x-v.x)+(this.y-v.y)*(this.y-v.y));
+				}
+				this.set = function(v){
+					this.x=v.x;
+					this.y=v.y;
+				}
+			}
+			function l(){
+				this.p1=new vector(0,0);
+				this.p2=new vector(0,0);
+				this.vel=new vector(0,0);
+				this.iswork=false;
+				this.end=false;
+				this.maxlen=0;
+				this.level=0;
+			}
+			
+			var example = document.getElementById("example"),
+			ctx = example.getContext('2d');
+			ctx.strokeRect(0, 0, example.width, example.height);
+			ctx.beginPath();
+			
+			var tree=[];
+			var count=40;
+			var maxlen=20;
+			var angle=Math.PI/4;
+			
+			for(i=0;i<count;i++){
+				tree[i]=new l();
+				tree[i].maxlen=maxlen;
+			}
+			tree[0].p1=new vector(240,310);
+			tree[0].p2=new vector(240,310);
+			tree[0].vel=new vector(0,-1);
+			tree[0].iswork=true;
+			ctx.lineCap = "round";
+		    setInterval(function(){
+				for(i=0;i<count;i++){
+					if(tree[i].iswork && !tree[i].end){
+						tree[i].p2.x+=tree[i].vel.x;
+						tree[i].p2.y+=tree[i].vel.y;
+						if(tree[i].p2.len(tree[i].p1)>=tree[i].maxlen){
+							tree[i].end=true;
+							k=0;
+							for(j=0;j<count;j++){
+								if(!tree[j].iswork){
+									tree[j].iswork=true;
+									tree[j].p1.set(tree[i].p2);
+									tree[j].p2.set(tree[i].p2);
+									tree[j].maxlen=tree[i].maxlen*(3/4);
+									tree[j].level=tree[i].level+1;
+									if(k==0)
+										koef=-1;
+									else{
+										if(k==1)
+											koef=1;
+										else
+											koef=0;
+									}
+								
+									tree[j].vel.x=tree[i].vel.x*Math.cos(angle)+koef*tree[i].vel.y*Math.sin(angle);
+									tree[j].vel.y=-koef*tree[i].vel.x*Math.sin(angle)+tree[i].vel.y*Math.cos(angle);
+									k++;
+									if(k==3) break;
+								}
+							}
+						}
+					}
+				}
+				//draw
+				for(i=0;i<count;i++){
+					if(tree[i].iswork && !tree[i].end){
+						/*if(tree[i].level<2){
+							ctx.lineWidth = 3;
+						}
+						if(tree[i].level>=2 && tree[i].level<5){
+							ctx.lineWidth = 2;
+						}
+						if(tree[i].level>=5 && tree[i].level<7){
+							ctx.lineWidth = 2;
+						}
+						if(tree[i].level>=7){
+							ctx.lineWidth = 1;
+						}*/
+						ctx.moveTo(tree[i].p1.x, tree[i].p1.y);
+						ctx.lineTo(tree[i].p2.x, tree[i].p2.y);
+					}
+				}
+				ctx.stroke();
+		    }, 1);
+		</script>
+	</body>
+</html>

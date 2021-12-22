@@ -1,0 +1,89 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<form action="index.html">
+			<input type=submit name="tree" value="Деревце">
+		</form>
+		<canvas height='320' width='480' id='example'>Обновите браузер</canvas>
+		<script>
+			function l(){
+				this.x1=0;
+				this.y1=0;
+				this.x2=0;
+				this.y2=0;
+				this.xv=0;
+				this.yv=0;
+				this.vetki=[];
+				this.iswork=false;
+				this.end=false;
+				this.maxlen=0;
+				this.level=0;
+			}
+			var example = document.getElementById("example"),
+			ctx = example.getContext('2d');
+			ctx.strokeRect(0, 0, example.width, example.height);
+			ctx.beginPath();
+			var tree=[];
+			var max=24;
+			var maxlen=40;
+			for(i=0;i<max;i++){
+				tree[i]=new l();
+				tree[i].maxlen=maxlen;
+			}
+			var c=1;
+			var angle=Math.PI/5.5;
+			tree[0].x1=240;
+			tree[0].y1=310;
+			tree[0].x2=240;
+			tree[0].y2=310;
+			tree[0].xv=0;
+			tree[0].yv=-1;
+			tree[0].iswork=true;
+		    setInterval(function(){
+				for(i=0;i<max;i++){
+					if(tree[i].iswork && !tree[i].end){
+						tree[i].x2+=tree[i].xv;
+						tree[i].y2+=tree[i].yv;
+						if(Math.sqrt((tree[i].x1-tree[i].x2)*(tree[i].x1-tree[i].x2)+(tree[i].y1-tree[i].y2)*(tree[i].y1-tree[i].y2))>=maxlen){
+							tree[i].end=true;
+							if(c<max){
+							tree[c].iswork=true;
+							tree[c].x1=tree[i].x2;
+							tree[c].y1=tree[i].y2;
+							tree[c].x2=tree[i].x2;
+							tree[c].y2=tree[i].y2;
+							
+							tree[c].xv=tree[i].xv*Math.cos(angle)-tree[i].yv*Math.sin(angle);
+							tree[c].yv=tree[i].xv*Math.sin(angle)+tree[i].yv*Math.cos(angle);
+							
+							tree[c].maxlen=maxlen*(30/44);
+							c++;
+							tree[c].iswork=true;
+							tree[c].x1=tree[i].x2;
+							tree[c].y1=tree[i].y2;
+							tree[c].x2=tree[i].x2;
+							tree[c].y2=tree[i].y2;
+							
+							tree[c].xv=tree[i].xv*Math.cos(angle)+tree[i].yv*Math.sin(angle);
+							tree[c].yv=-tree[i].xv*Math.sin(angle)+tree[i].yv*Math.cos(angle);
+							
+							tree[c].maxlen=maxlen*(30/44);
+							c++;
+							}
+						}
+					}
+				}
+				//draw
+				for(i=0;i<max;i++){
+					if(tree[i].iswork){
+						ctx.moveTo(tree[i].x1, tree[i].y1);
+						ctx.lineTo(tree[i].x2, tree[i].y2);
+					}
+				}
+				ctx.stroke(); // *22
+		    }, 50);
+		</script>
+	</body>
+</html>
